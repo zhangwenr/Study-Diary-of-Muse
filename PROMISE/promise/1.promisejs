@@ -1,0 +1,35 @@
+// 原生的es6是自己实现了promise不需要考虑兼容
+// 1.promise是一个类 在使用的时候 需要new这个类
+// 2.在newPromis的时候，需要传入一个executor执行器，默认会被立即调用，而且参数有两个——resolve，reject
+// 3.promise有三个状态 分别是pendding 默认状态 onfulfilled 成功态 onrejected 失败态
+// 我们的promise默认就是pendding 当用户调用resolve时会变成成功态  调用reject的时候会变成失败态
+// 4.new Promise 会返回一个promise实例 这个实例上有一个then方法，then方法中有两个参数：一个是成功的回调，一个是失败的回调
+// 5.走向失败有两种情况 reject() 用户主动抛出异常——throw new Error()
+// 6.一个promise中可以then多次 （发布订阅模式）
+// 7.promise的状态时不能从成功变成失败，也不能从失败变成成功 只有pending的时候才能改变状态
+
+// promise/A+规范 遵循此规范，不同的promise之间可以互相调用
+// 1.1 "promise" is an object or function with a then method whose behavior conforms to this specification.
+// 1.2 "thenable"(实例,能调用then方法的) is an object or function that defines a the method.
+// 1.3 "value" is any legal JavaScript value(including undefined,a thenable,or a promise).
+// 1.4 "exception" is a value that is thrown using the throw statement.
+// 1.5 "reason" is a value that indicates why a promise was rejected.
+// 实例：
+/**
+const Promise = require('./history/1.promise')
+let p = new Promise((resolve, reject) => {
+    resolve('ok')
+    throw new Error('出错了')
+})
+
+p.then((value) => {
+    console.log(value, 's')
+}, (reason) => {
+    console.log(reason, 'f')
+})
+p.then((value) => {
+    console.log(value, 's')
+}, (reason) => {
+    console.log(reason, 'f')
+})
+ */

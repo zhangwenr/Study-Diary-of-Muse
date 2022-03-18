@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="vue.js"></script>
+    <script>
+        // console.log(Vue)
+        // 响应式的数据变化，数据变化了我可以监控到数据的变化
+        // 数据的取值 和 更改值我们要监控到
+        class A{
+            constructor(a,b){
+                this.a = 1
+                this.b = 2
+            }
+        }
+        const vm = new Vue({
+            data(){
+                return new A()
+            }
+        })
+        const vm1 = new Vue({
+            data:{
+                name:'zf',
+                age:20,
+                address:{
+                    content:'东江',
+                    num:30
+                }
+            }
+        })
+        vm.name = 'ok' // 修改触发set
+        vm1.name = 'ok' // 修改触发set
+        console.log('vm------', vm)
+        console.log('vm1------', vm1.address.num)
+    </script>
+</body>
+</html>

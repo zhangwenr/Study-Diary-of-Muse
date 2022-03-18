@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 我们可以给模板中的属性 增加一个收集器 dep -->
+    <!-- 页面渲染的时候 我们将渲染逻辑封装到watcher中 vm._update(vm._render()) -->
+    <!-- 让dep记住这个watcher即可，稍后属性变化了可以找到对应的dep中存放的watcher进行重新渲染 -->
+    <!-- 观察者模式 -->
+    <div id="app" style="color: blue;background: aqua;">
+        <div style="color: red;">
+            {{name}} {{name}} {{age}} {{age}}
+        </div>
+        <span>world</span>
+    </div>
+    <script src="vue.js"></script>
+    <script>
+        const vm = new Vue({
+            data:{
+                name:'zf',
+                age:20,
+                address:{
+                    num:30,
+                    content:'回龙观'
+                },
+                hobby:['eat','drink',{a:1}]
+            },
+            // template:'<div>hello</div>'
+            // el:'#app', // 我们要将数据 解析到el元素
+            // render(){
+            //     return createElement('div',{})
+            // }
+        })
+        vm.$mount('#app')
+        // 1.模板引擎 性能差 需要正则匹配替换 1.0的时候 没有引入虚拟DOM的改变
+        // 2.采用虚拟DOM，数据变化后比较虚拟DOM的差异 最后更新需要更新的地方
+        // 3.核心就是我们需要将模板边恒我们的js语法，通过js语法生成虚拟DOM
+
+        // 从一个东西 变成 另一个东西 语法之间的转化 es6-》es5
+        // css压缩 我们需要先变成语法树再重新组装代码成为新的语法 将template语法转换成render函数
+
+        // 属性和我们的试图管理拿起来 做到数据变化可以自动更新试图（观察者模式）
+        // setTimeout(()=>{
+        //     vm.name='jw' // 事件环 同步任务 异步任务
+        //     vm.age=30
+        //     // 手动更新
+        //     // vm._update(vm._render())  // 重新根据数据渲染出一个虚拟dom
+        // },1000)
+
+        // Promise优先级略高于setTimeout
+        vm.$nextTick(()=>{
+            console.log(app.innerHTML) // 同步获取dao
+        })
+        vm.name = 'jw' // 不会立即重新渲染页面
+
+
+        // 1）将数据先处理成响应式 initState(针对对象来说主要是增加defineProperty 针对数组就是重写方法)
+        // 2）模板编译：将模板先转换成ast语法树，将ast语法树生成**render**方法
+        // 3）调用render函数 会进行取值操作 产生对应的虚拟DOM render(){_c('dev',null,_v(name))} 触发get方法
+        // 4）将虚拟dom渲染成真实dom
+
+        // 1.观察者模式实现依赖收集
+        // 2.异步更新策略
+        // 3.mixin的实现原理
+    </script>
+</body>
+</html>

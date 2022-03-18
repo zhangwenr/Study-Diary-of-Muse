@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app" style="color: blue;background: aqua;">
+        <div style="color: red;">
+            {{name}} {{name}} {{age}} {{age}}
+        </div>
+        <span>world</span>
+    </div>
+    <script src="vue.js"></script>
+
+    <script>
+        // 1.Vue.options = {} {created(){}}
+        Vue.mixin({
+            created(){
+                console.log('mixin1-created')
+            },
+            a:1
+        })
+        // 2.Vue.options = {created:[fn]} {created(){}}
+        Vue.mixin({
+            created(){
+                console.log('mixin2-created')
+            },
+            b:1
+        })
+        // 发布 =》 订阅
+        console.log(Vue.options)
+        // 内部会将多个created 合并成一个队列 依次执行
+        const vm = new Vue({
+            data:{
+                name:'zf',
+                age:20,
+                address:{
+                    num:30,
+                    content:'回龙观'
+                },
+                hobby:['eat','drink',{a:1}]
+            },
+            // Vue.options = {created:[fn,fn]} {created:fn(){}}
+            created(){
+                console.log('beforeCreate')
+            }
+        })
+        // vue.mixin 混合 可以混入一些公共方法
+
+    </script>
+</body>
+</html>
