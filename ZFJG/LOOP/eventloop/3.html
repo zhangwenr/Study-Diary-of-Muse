@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button id="button"></button>
+    <script>
+        button.addEventListener('click', () => {
+            console.log('listener1')
+            Promise.resolve().then(() => console.log("micro task1"))
+        })
+        button.addEventListener('click', () => {
+            console.log('listener2')
+            Promise.resolve().then(() => console.log("micro task2"))
+        })
+        // 事件是宏任务 宏任务的执行顺序是 1个个执行
+        button.click() // 没有基于宏任务 相当于fn1() fn2()这样执行 直接就执行了 用户触发是宏任务，代码触发不是宏任务
+        // fn1()
+        // fn2()
+    </script>
+</body>
+
+</html>

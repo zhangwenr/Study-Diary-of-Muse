@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        Promise.resolve().then(() => {
+            console.log("Promise1")
+            setTimeout(() => {
+                console.log("setTimeout2")
+            }, 0)
+        })
+        setTimeout(() => {
+            console.log("setTimeout1")
+            Promise.resolve().then(() => {
+                console.log("Promise2")
+            })
+        }, 0)
+
+        // 宏任务队列 [setTimeout1,setTimeout2]
+        // 微任务队列 []
+
+        // 清空微任务队列
+        // Promise1
+
+        // 取出一个宏任务来执行
+        // setTimeout2
+        // 微任务队列 [Promise2]
+
+        // 清空微任务队列
+        // Promise2
+
+        // 取出宏任务来执行
+        // setTimeout2
+    </script>
+</body>
+
+</html>
