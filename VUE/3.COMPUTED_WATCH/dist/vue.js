@@ -468,9 +468,10 @@
         this.depsId = new Set();
         this.lazy = options.lazy;
         this.dirty = this.lazy; // 缓存值
-        // 默认不执行
 
-        console.log(this.lazy);
+        this.vm = vm;
+        console.log(this.lazy); // 默认不执行
+
         this.lazy ? undefined : this.get();
       } // 让渲染逻辑记住dep
 
@@ -491,34 +492,48 @@
       }, {
         key: "evaluate",
         value: function evaluate() {
-          this.value = this.get(); // 获取到用户函数的返回值 并且还要标识为脏
+          this.value = this.get(); // 获取到用户函数的返回值 并且还要标识为脏 
 
           this.dirty = false;
         }
       }, {
         key: "get",
         value: function get() {
-          console.log(this); // 把watcher暴露在全局上
-
+          // 把watcher暴露在全局上
           pushTarget(this); // 静态属性只有一份
 
-          var value = this.getter(); // 会去vm上取值
+          var value = this.getter.call(this.vm); // 会去vm上取值
 
           popTarget(); // 渲染完毕后就清空
 
           return value;
         }
       }, {
+        key: "depend",
+        value: function depend() {
+          var i = this.deps.length;
+
+          while (i--) {
+            //  dep.depend()
+            this.deps[i].depend(); // 让计算属性watcher 也收集渲染watcher
+          }
+        }
+      }, {
         key: "update",
         value: function update() {
-          // 异步更新
-          queueWatcher(this); // 吧当前的watcher缓存其阿里
-          // this.get() // 重新渲染
+          // 依赖的属性发生变化了 就标识计算属性是脏值了
+          if (this.lazy) {
+            this.dirty = true;
+          } else {
+            // 异步更新
+            queueWatcher(this); // 吧当前的watcher缓存其阿里
+            // this.get() // 重新渲染
+          }
         }
       }, {
         key: "run",
         value: function run() {
-          console.log('run');
+          // console.log('run')
           this.get();
         }
       }]);
@@ -864,32 +879,41 @@
           lazy: true
         }); // 不要立即执行 要懒执行
 
+        console.log('watchers------', watchers);
+        console.log('key------', key);
+        console.log('userDef------', userDef);
         defineComputed(vm, key, userDef);
       }
     }
 
     function defineComputed(target, key, userDef) {
       // const getter = typeof userDef === 'function' ? userDef : userDef.get
-      var setter = userDef.set || function () {}; // console.log(getter, setter)
-      // 可以通过实例拿到对应的属性
+      var setter = userDef.set || function () {}; // 可以通过实例拿到对应的属性
 
 
       Object.defineProperty(target, key, {
         get: createComputedGetter(key),
         set: setter
       });
-    }
+    } // 计算属性根本不会收集依赖，只会让自己的依赖属性去收集依赖
+
 
     function createComputedGetter(key) {
+      // 检测是否要执行这个getter
       return function () {
         var watcher = this._computedWatchers[key]; // 获取到对应属性的watcher
 
         if (watcher.dirty) {
           // 如果是脏的就去执行 用户传入的函数
-          watcher.evaluate();
+          watcher.evaluate(); // 求值后 dirty变为了false，下次就不求值了
         }
 
-        return this.value;
+        if (Dep.target) {
+          // 计算属性出栈后 还要渲染watcher，我应该让计算属性watcher里面的属性 也去收集上层watcher
+          watcher.depend();
+        }
+
+        return watcher.value; // 最后返回的是watcher上的值
       };
     }
 

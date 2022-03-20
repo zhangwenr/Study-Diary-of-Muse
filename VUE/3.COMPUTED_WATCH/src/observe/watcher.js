@@ -16,9 +16,10 @@ class Watcher { // 不同组件有不同的watcher
         this.depsId = new Set()
         this.lazy = options.lazy
         this.dirty = this.lazy // 缓存值
+        this.vm = vm
+        console.log(this.lazy)
 
         // 默认不执行
-        console.log(this.lazy)
         this.lazy ? undefined : this.get()
     }
     // 让渲染逻辑记住dep
@@ -33,24 +34,36 @@ class Watcher { // 不同组件有不同的watcher
         }
     }
     evaluate() {
-        this.value = this.get() // 获取到用户函数的返回值 并且还要标识为脏
-        this.dirty = false
+        this.value = this.get(); // 获取到用户函数的返回值 并且还要标识为脏 
+        this.dirty = false;
     }
     get() {
-        console.log(this)
         // 把watcher暴露在全局上
         pushTarget(this)  // 静态属性只有一份
-        let value = this.getter() // 会去vm上取值
+        let value = this.getter.call(this.vm) // 会去vm上取值
         popTarget() // 渲染完毕后就清空
         return value
     }
+    depend() {
+        let i = this.deps.length
+        while (i--) {
+            //  dep.depend()
+            this.deps[i].depend() // 让计算属性watcher 也收集渲染watcher
+
+        }
+    }
     update() {
-        // 异步更新
-        queueWatcher(this) // 吧当前的watcher缓存其阿里
-        // this.get() // 重新渲染
+        // 依赖的属性发生变化了 就标识计算属性是脏值了
+        if (this.lazy) {
+            this.dirty = true
+        } else {
+            // 异步更新
+            queueWatcher(this) // 吧当前的watcher缓存其阿里
+            // this.get() // 重新渲染
+        }
     }
     run() {
-        console.log('run')
+        // console.log('run')
         this.get()
     }
 }
